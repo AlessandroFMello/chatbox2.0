@@ -13,10 +13,6 @@ services:
     container_name: chatterbox-api
     env_file:
       - ./api/.env
-    environment:
-      - MONGO_URI=mongodb://mongo:27017
-      - MONGO_DB=chatterbox
-      - CORS_ORIGINS=http://localhost:5173
     ports:
       - "8000:8000"
     depends_on:

@@ -1,0 +1,44 @@
+services:
+  mongo:
+    image: mongo:7
+    container_name: chatterbox-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: unless-stopped
+
+  api:
+    build: ./api
+    container_name: chatterbox-api
+    env_file:
+      - ./api/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017
+      - MONGO_DB=chatterbox
+      - CORS_ORIGINS=http://localhost:5173
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./api/app:/app/app
+    restart: unless-stopped
+
+  web:
+    build: ./web
+    container_name: chatterbox-web
+    environment:
+      - VITE_API_URL=http://localhost:8000
+      - VITE_WS_URL=ws://localhost:8000
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    volumes:
+      - ./web/src:/app/src
+      - ./web/index.html:/app/index.html
+    restart: unless-stopped
+
+volumes:
+  mongo_data:

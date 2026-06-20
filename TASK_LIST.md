@@ -8,10 +8,10 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 0 — Repository scaffolding
 
-- [ ] **0.1** Initialize Git repository; first commit contains only `README.md`, `ARCHITECTURE.md`, `TASK_LIST.md`, `LICENSE`, `.gitignore`.
-- [ ] **0.2** Create top-level folder structure: `api/`, `web/`, `docs/`.
-- [ ] **0.3** Commit `docker-compose.yml`, `api/Dockerfile`, `web/Dockerfile` (empty service builds OK at this stage).
-- [ ] **0.4** Verify `docker compose config` parses with no errors.
+- [x] **0.1** Initialize Git repository; first commit contains only `README.md`, `ARCHITECTURE.md`, `TASK_LIST.md`, `LICENSE`, `.gitignore`.
+- [x] **0.2** Create top-level folder structure: `api/`, `web/`, `docs/`.
+- [x] **0.3** Commit `docker-compose.yml`, `api/Dockerfile`, `web/Dockerfile` (empty service builds OK at this stage).
+- [x] **0.4** Verify `docker compose config` parses with no errors.
 
 **Exit criteria:** Repository is on GitHub. Compose file is valid. Documentation files are visible.
 
@@ -19,7 +19,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 1 — Backend skeleton
 
-- [ ] **1.1** Create `api/requirements.txt` with: `fastapi`, `uvicorn[standard]`, `motor`, `pydantic-settings`, `google-genai`, `python-dotenv`, `pytest`, `pytest-asyncio`, `httpx`.
+- [x] **1.1** Create `api/requirements.txt` with: `fastapi`, `uvicorn[standard]`, `motor`, `pydantic-settings`, `google-genai`, `python-dotenv`, `pytest`, `pytest-asyncio`, `httpx`.
 - [ ] **1.2** Create `api/app/__init__.py` and `api/app/main.py` with a FastAPI app exposing `GET /health` returning `{"status": "ok"}`.
 - [ ] **1.3** Create `api/app/config.py` with a `Settings` class (Pydantic `BaseSettings`) reading `MONGO_URI`, `MONGO_DB`, `AI_API_KEY`, `AI_MODEL`, `CORS_ORIGINS`.
 - [ ] **1.4** Create `api/.env.example` with placeholders for every variable in `Settings`.

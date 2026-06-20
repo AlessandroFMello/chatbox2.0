@@ -22,8 +22,8 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **1.1** Create `api/requirements.txt` with: `fastapi`, `uvicorn[standard]`, `motor`, `pydantic-settings`, `google-genai`, `python-dotenv`, `pytest`, `pytest-asyncio`, `httpx`.
 - [x] **1.2** Create `api/app/__init__.py` and `api/app/main.py` with a FastAPI app exposing `GET /health` returning `{"status": "ok"}`.
 - [x] **1.3** Create `api/app/config.py` with a `Settings` class (Pydantic `BaseSettings`) reading `MONGO_URI`, `MONGO_DB`, `AI_API_KEY`, `AI_MODEL`, `CORS_ORIGINS`.
-- [ ] **1.4** Create `api/.env.example` with placeholders for every variable in `Settings`.
-- [ ] **1.5** Add CORS middleware to `main.py` using `Settings.CORS_ORIGINS`.
+- [x] **1.4** Create `api/.env.example` with placeholders for every variable in `Settings`.
+- [x] **1.5** Add CORS middleware to `main.py` using `Settings.CORS_ORIGINS`.
 - [ ] **1.6** Run `docker compose up api mongo --build`; verify `GET http://localhost:8000/health` returns 200 and `http://localhost:8000/docs` loads.
 
 **Exit criteria:** API container starts cleanly, health endpoint responds, Swagger renders.

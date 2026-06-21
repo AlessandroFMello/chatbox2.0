@@ -2,11 +2,39 @@
 
 PoC para validar uma reescrita do ChatterBox como sistema desacoplado (API + Web) com IA generativa no lugar do chatbot de mercado atual.
 
-## Contexto
+---
+
+## Sumário
+
+- [Contexto](#contexto)
+- [Arquitetura](#arquitetura)
+- [Stack](#stack)
+- [Como rodar](#como-rodar)
+- [Fluxo da aplicação](#fluxo-da-aplicação)
+- [Demonstração](#demonstração)
+- [Decisões técnicas e trade-offs](#decisões-técnicas-e-trade-offs)
+- [Problemas encontrados e como foram resolvidos](#problemas-encontrados-e-como-foram-resolvidos)
+- [O que considerei e decidi não aplicar](#o-que-considerei-e-decidi-não-aplicar)
+- [O que foi deixado de fora intencionalmente](#o-que-foi-deixado-de-fora-intencionalmente)
+- [Próximos passos](#próximos-passos-fora-do-escopo-da-poc)
+- [Estrutura do repositório](#estrutura-do-repositório)
+- [Licença](#licença)
+
+---
+
+<a name="contexto"></a>
+<details>
+<summary><strong>Contexto</strong></summary>
 
 Esta PoC valida o fluxo essencial: usuário inicia uma conversa, troca mensagens com uma IA que tem um objetivo fixo de persuasão (*"convencer o usuário que a Terra é plana"*), e as mensagens são exibidas em tempo real via streaming.
 
-## Arquitetura
+</details>
+
+---
+
+<a name="arquitetura"></a>
+<details>
+<summary><strong>Arquitetura</strong></summary>
 
 - **API** (Python / FastAPI / MongoDB): mantém as conversas e orquestra a chamada ao provedor de IA.
 - **Web** (React + Vite): interface de chat, consome a API via REST + WebSocket.
@@ -16,7 +44,13 @@ Tudo sobe via Docker Compose como três serviços isolados, simulando a separaç
 
 > Detalhamento completo da arquitetura, fluxos e estrutura de pastas em [`ARCHITECTURE.md`](./ARCHITECTURE.md).
 
-## Stack
+</details>
+
+---
+
+<a name="stack"></a>
+<details>
+<summary><strong>Stack</strong></summary>
 
 | Camada | Tecnologia |
 |--------|-----------|
@@ -27,7 +61,13 @@ Tudo sobe via Docker Compose como três serviços isolados, simulando a separaç
 | Testes | pytest + pytest-asyncio |
 | Infra local | Docker Compose |
 
-## Como rodar
+</details>
+
+---
+
+<a name="como-rodar"></a>
+<details>
+<summary><strong>Como rodar</strong></summary>
 
 **Pré-requisitos:** Docker e Docker Compose instalados; chave de API do Google AI Studio (gratuita em <https://aistudio.google.com/apikey>).
 
@@ -44,18 +84,36 @@ docker compose up --build
 - **Web**: <http://localhost:5173>
 - **MongoDB**: `mongodb://localhost:27017` (exposto para facilitar inspeção via Compass)
 
-## Fluxo da aplicação
+</details>
+
+---
+
+<a name="fluxo-da-aplicação"></a>
+<details>
+<summary><strong>Fluxo da aplicação</strong></summary>
 
 1. Usuário acessa a Web e informa **nome + e-mail** (identificação leve, sem senha).
 2. Se o e-mail já tem conversa, ela é retomada; caso contrário, uma nova é criada.
 3. Usuário envia mensagem → API persiste no Mongo → chama o Gemini com o histórico + system prompt fixo → resposta é transmitida ao vivo via WebSocket.
 4. Ao final do stream, a mensagem completa da IA é persistida no Mongo.
 
-## Demonstração
+</details>
+
+---
+
+<a name="demonstração"></a>
+<details>
+<summary><strong>Demonstração</strong></summary>
 
 > *A ser adicionado após implementação: GIF curto mostrando o streaming ao vivo e uma troca de mensagens em que a IA defende a tese da Terra plana.*
 
-## Decisões técnicas e trade-offs
+</details>
+
+---
+
+<a name="decisões-técnicas-e-trade-offs"></a>
+<details>
+<summary><strong>Decisões técnicas e trade-offs</strong></summary>
 
 ### Provedor de IA: Google Gemini 2.5 Flash
 Gratuito no tier do AI Studio, suporta streaming nativo via SDK Python. A chave fica isolada na API (variável de ambiente), nunca exposta ao frontend.
@@ -90,7 +148,13 @@ O system prompt da IA foi dividido em seções explícitas (persona, objetivo, r
 ### Organização do código (API)
 Separação em camadas simples (`routers` → `services` → `repositories`), sem abstrações formais de interface/injeção de dependência. Suficiente para isolar responsabilidades sem o peso de Clean Architecture completa.
 
-## Problemas encontrados e como foram resolvidos
+</details>
+
+---
+
+<a name="problemas-encontrados-e-como-foram-resolvidos"></a>
+<details>
+<summary><strong>Problemas encontrados e como foram resolvidos</strong></summary>
 
 ### `generate_content_stream` exige `await` antes da iteração
 O método de streaming do SDK do Google Gemini retorna uma corrotina (não um iterador assíncrono diretamente). Tentar iterar com `async for chunk in client.aio.models.generate_content_stream(...)` sem o `await` resulta em `TypeError: 'async for' requires an object with __aiter__ method, got coroutine`. A correção é `async for chunk in await client.aio.models.generate_content_stream(...)`.
@@ -101,14 +165,26 @@ Clientes como Insomnia (e alguns browsers) enviam um frame de texto vazio ao est
 ### Gemini respondendo perguntas fora do personagem
 O modelo respondia a perguntas completamente fora do escopo (ex: receitas de comida) em vez de redirecionar para o tema da Terra plana, apesar do system prompt. O prompt foi ajustado com uma seção explícita de "Off-topic requests" instruindo o modelo a não atender requisições não relacionadas e redirecionar a conversa de volta ao tema central.
 
-## O que considerei e decidi não aplicar
+</details>
+
+---
+
+<a name="o-que-considerei-e-decidi-não-aplicar"></a>
+<details>
+<summary><strong>O que considerei e decidi não aplicar</strong></summary>
 
 - **Clean Architecture / DDD / TDD completo**: adicionaria uma cerimônia (entidades, casos de uso, interfaces de repositório) desproporcional ao escopo de uma PoC com poucos endpoints. Optei por camadas simples e testes concentrados nos pontos de maior risco (integração com IA, streaming).
 - **RAG**: faria sentido se a IA precisasse responder com base em uma base de conhecimento específica (produtos, políticas, etc). Como o objetivo aqui é um papel de persuasão fixo via system prompt, RAG não agrega valor — mas seria a escolha natural no ChatterBox 2.0 real, quando a IA precisar de conhecimento específico de cada cliente.
 - **Next.js no lugar de React puro**: o principal ganho de Next.js seria uma camada de BFF para esconder chaves de API do client. Como a API Python já cumpre esse papel (a chave de IA nunca chega ao frontend), esse benefício não se aplica aqui, então mantive React puro (Vite).
 - **TanStack Query / Zustand**: o fluxo de dados é simples o bastante (uma leitura de histórico, um envio de mensagem, um stream) para `useState` e `fetch` nativo, sem necessidade de cache ou estado global.
 
-## O que foi deixado de fora intencionalmente
+</details>
+
+---
+
+<a name="o-que-foi-deixado-de-fora-intencionalmente"></a>
+<details>
+<summary><strong>O que foi deixado de fora intencionalmente</strong></summary>
 
 - Autenticação e autorização reais
 - Múltiplos usuários simultâneos com permissões
@@ -116,7 +192,13 @@ O modelo respondia a perguntas completamente fora do escopo (ex: receitas de com
 - Rate limiting
 - Deploy / CI
 
-## Próximos passos (fora do escopo da PoC)
+</details>
+
+---
+
+<a name="próximos-passos-fora-do-escopo-da-poc"></a>
+<details>
+<summary><strong>Próximos passos (fora do escopo da PoC)</strong></summary>
 
 - Sumarização de histórico para conversas longas
 - RAG para conhecimento específico por cliente
@@ -124,7 +206,13 @@ O modelo respondia a perguntas completamente fora do escopo (ex: receitas de com
 - Observabilidade (logs estruturados, métricas de latência da IA)
 - Separação efetiva em dois repositórios / dois serviços com pipelines independentes
 
-## Estrutura do repositório
+</details>
+
+---
+
+<a name="estrutura-do-repositório"></a>
+<details>
+<summary><strong>Estrutura do repositório</strong></summary>
 
 Ver [`ARCHITECTURE.md`](./ARCHITECTURE.md) para detalhamento completo.
 
@@ -140,6 +228,14 @@ chatterbox-poc/
 └── LICENSE
 ```
 
-## Licença
+</details>
+
+---
+
+<a name="licença"></a>
+<details>
+<summary><strong>Licença</strong></summary>
 
 MIT — ver [`LICENSE`](./LICENSE).
+
+</details>

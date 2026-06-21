@@ -4,12 +4,13 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.database import _client
+from app.database import _client, get_conversations_collection
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await _client.admin.command("ping")
+    await get_conversations_collection().create_index("user_email", unique=True)
     yield
     _client.close()
 

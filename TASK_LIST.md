@@ -34,7 +34,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 - [x] **2.1** Create `api/app/database.py` with a Motor client initialized at module load using `Settings.MONGO_URI`; expose a `get_conversations_collection()` helper.
 - [x] **2.2** Hook up `startup` and `shutdown` events in `main.py` to connect / disconnect the Motor client.
-- [ ] **2.3** On startup, create the unique index on `user_email` in the `conversations` collection.
+- [x] **2.3** On startup, create the unique index on `user_email` in the `conversations` collection.
 - [ ] **2.4** Create `api/app/models/message.py` with a `Message` Pydantic model (`role`, `content`, `timestamp`) and a `Role` enum (`user`, `assistant`).
 - [ ] **2.5** Create `api/app/models/conversation.py` with `Conversation` (document shape) and request/response schemas: `ConversationCreate` (name, email), `ConversationOut` (id, name, email, messages, timestamps).
 - [ ] **2.6** Create `api/app/repositories/conversation_repository.py` with methods: `get_by_email`, `create`, `get_by_id`, `append_message`. All async; all input/output as Pydantic models or primitives, never raw Mongo dicts at the boundary.

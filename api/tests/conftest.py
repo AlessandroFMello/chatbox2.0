@@ -1,10 +1,9 @@
 from datetime import datetime, timezone
-from typing import AsyncIterator
 
 import pytest
 
 from app.models.conversation import ConversationOut
-from app.models.message import Message, Role
+from app.models.message import Message
 
 
 class InMemoryConversationRepository:
@@ -43,16 +42,6 @@ class InMemoryConversationRepository:
         )
 
 
-async def _fake_stream(user_name: str, messages: list[Message]) -> AsyncIterator[str]:
-    for chunk in ["Hello", ", ", "flat", " ", "Earther", "!"]:
-        yield chunk
-
-
 @pytest.fixture
 def repo() -> InMemoryConversationRepository:
     return InMemoryConversationRepository()
-
-
-@pytest.fixture
-def fake_stream():
-    return _fake_stream

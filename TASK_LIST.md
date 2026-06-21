@@ -88,7 +88,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
   - `in_memory_repository` — a fake repository implementing the same interface.
   - `fake_ai_service` — yields a fixed sequence of chunks.
 - [x] **6.2** Write `tests/test_conversation_service.py` covering: get_or_create returns existing on duplicate email; new email creates a conversation; add_user_message appends correctly; persist_ai_message appends with role=assistant.
-- [ ] **6.3** Write `tests/test_ai_service.py` covering: system prompt includes the user's name; prompt includes full message history; chunks are forwarded in order; SDK exception is wrapped in `AIServiceError`.
+- [x] **6.3** Write `tests/test_ai_service.py` covering: system prompt includes the user's name; prompt includes full message history; chunks are forwarded in order; SDK exception is wrapped in `AIServiceError`.
 - [ ] **6.4** Verify `cd api && pytest` is green.
 
 **Exit criteria:** Tests pass. Coverage of the two critical services is meaningful.

@@ -109,7 +109,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 ## Phase 8 — Identity flow
 
 - [x] **8.1** Create `src/components/UserIdentityForm.tsx` with two fields (name, email), basic email format validation, a submit button.
-- [ ] **8.2** In `App.tsx`, manage `currentConversation` state: if absent, render the identity form; on submit, call `createOrGetConversation`, store the returned conversation, then render the chat shell.
+- [x] **8.2** In `App.tsx`, manage `currentConversation` state: if absent, render the identity form; on submit, call `createOrGetConversation`, store the returned conversation, then render the chat shell.
 - [ ] **8.3** Persist `{conversationId, name, email}` in `localStorage` so a page reload skips the form. Add a "Trocar usuário" link to clear it.
 
 **Exit criteria:** Form submission creates/retrieves a conversation. Reloading the page keeps the user in their chat.

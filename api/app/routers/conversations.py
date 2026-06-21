@@ -3,7 +3,6 @@ from pydantic import BaseModel
 
 from app.models.conversation import ConversationCreate, ConversationOut
 from app.models.message import Message
-from app.repositories import conversation_repository
 from app.services import conversation_service
 
 router = APIRouter(prefix="/conversations", tags=["conversations"])
@@ -20,7 +19,7 @@ async def create_or_get_conversation(body: ConversationCreate) -> ConversationOu
 
 @router.get("/{conversation_id}", response_model=ConversationOut)
 async def get_conversation(conversation_id: str) -> ConversationOut:
-    conversation = await conversation_repository.get_by_id(conversation_id)
+    conversation = await conversation_service.get_conversation(conversation_id)
     if not conversation:
         raise HTTPException(status_code=404, detail="Conversation not found")
     return conversation

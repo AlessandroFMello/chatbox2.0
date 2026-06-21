@@ -61,25 +61,27 @@ chatterbox-poc/
 ├── web/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ChatWindow.jsx            # Main chat shell
-│   │   │   ├── MessageBubble.jsx         # Single message (user/AI styled)
-│   │   │   ├── MessageList.jsx           # Scrollable list with auto-scroll
-│   │   │   ├── MessageInput.jsx          # Textarea + send button
-│   │   │   └── UserIdentityForm.jsx      # Name/email entry screen
+│   │   │   ├── ChatWindow.tsx            # Main chat shell
+│   │   │   ├── MessageBubble.tsx         # Single message (user/AI styled)
+│   │   │   ├── MessageList.tsx           # Scrollable list with auto-scroll
+│   │   │   ├── MessageInput.tsx          # Textarea + send button
+│   │   │   └── UserIdentityForm.tsx      # Name/email entry screen
 │   │   ├── hooks/
-│   │   │   ├── useChatSocket.js          # WebSocket lifecycle + token concat
-│   │   │   └── useConversation.js        # Load history, send message
+│   │   │   ├── useChatSocket.ts          # WebSocket lifecycle + token concat
+│   │   │   └── useConversation.ts        # Load history, send message
 │   │   ├── services/
-│   │   │   └── api.js                    # Thin fetch wrapper
-│   │   ├── App.jsx                       # Routes between identity form and chat
-│   │   ├── main.jsx                      # React entrypoint
+│   │   │   └── api.ts                    # Typed fetch wrapper + shared types
+│   │   ├── App.tsx                       # Routes between identity form and chat
+│   │   ├── main.tsx                      # React entrypoint
+│   │   ├── vite-env.d.ts                 # Vite env type declarations
 │   │   └── index.css                     # Tailwind directives
 │   ├── public/
 │   ├── Dockerfile
 │   ├── package.json
+│   ├── tsconfig.json
 │   ├── tailwind.config.js
 │   ├── postcss.config.js
-│   ├── vite.config.js
+│   ├── vite.config.ts
 │   └── index.html
 │
 ├── docs/                                 # Screenshots, GIFs, diagrams for README

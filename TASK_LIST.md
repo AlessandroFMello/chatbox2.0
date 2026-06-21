@@ -97,9 +97,9 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 7 — Frontend scaffolding
 
-- [ ] **7.1** Inside `web/`, scaffold a Vite + React project (`npm create vite@latest . -- --template react`).
-- [ ] **7.2** Install Tailwind and configure `tailwind.config.js`, `postcss.config.js`, and `src/index.css` with the three Tailwind directives.
-- [ ] **7.3** Create `src/services/api.js` with `createOrGetConversation({name, email})`, `getConversation(id)`, `sendUserMessage(id, content)`. Single `apiFetch` helper using native `fetch`.
+- [x] **7.1** Inside `web/`, scaffold a Vite + React project (`npm create vite@latest . -- --template react`).
+- [x] **7.2** Install Tailwind and configure `tailwind.config.js`, `postcss.config.js`, and `src/index.css` with the three Tailwind directives.
+- [x] **7.3** Create `src/services/api.js` with `createOrGetConversation({name, email})`, `getConversation(id)`, `sendUserMessage(id, content)`. Single `apiFetch` helper using native `fetch`.
 - [ ] **7.4** Wire the `web` service in Docker Compose; confirm `http://localhost:5173` shows the default Vite page.
 
 **Exit criteria:** Frontend container builds and serves a page. Tailwind classes work in a smoke test (e.g. `bg-red-500` on the root div).

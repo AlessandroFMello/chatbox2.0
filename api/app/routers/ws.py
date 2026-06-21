@@ -1,5 +1,6 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from app.services import conversation_service
 from app.services.ai_service import AIServiceError, stream_response
 
 router = APIRouter()
@@ -12,11 +13,18 @@ async def ws_chat(websocket: WebSocket, conversation_id: str) -> None:
         while True:
             await websocket.receive_json()
 
+            conversation = await conversation_service.get_conversation(conversation_id)
+            if not conversation:
+                await websocket.send_json({"type": "error", "message": "Conversation not found"})
+                await websocket.close()
+                return
+
             full_content = ""
-            async for chunk in stream_response("", []):
+            async for chunk in stream_response(conversation.user_name, conversation.messages):
                 full_content += chunk
                 await websocket.send_json({"type": "chunk", "content": chunk})
 
+            await conversation_service.persist_ai_message(conversation_id, full_content)
             await websocket.send_json({"type": "end"})
 
     except AIServiceError as e:

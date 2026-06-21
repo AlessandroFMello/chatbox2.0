@@ -64,7 +64,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
   - A method `build_prompt(user_name, messages)` that assembles the request payload (system instruction + history).
   - A method `stream_response(user_name, messages) -> AsyncIterator[str]` that calls Gemini in streaming mode and yields text chunks.
 - [x] **4.2** Add error handling: if the SDK raises, the iterator raises a typed `AIServiceError` the WebSocket layer can catch.
-- [ ] **4.3** Smoke-test `ai_service` by writing a small script that prints chunks for a hard-coded message (do not commit the script).
+- [x] **4.3** Smoke-test `ai_service` by writing a small script that prints chunks for a hard-coded message (do not commit the script).
 
 **Exit criteria:** Calling `ai_service.stream_response(...)` from a Python REPL yields tokens from Gemini.
 
@@ -72,7 +72,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 5 — WebSocket streaming
 
-- [ ] **5.1** Create `api/app/routers/ws.py` with a `WebSocket /ws/conversations/{id}` endpoint.
+- [x] **5.1** Create `api/app/routers/ws.py` with a `WebSocket /ws/conversations/{id}` endpoint.
 - [ ] **5.2** Protocol per client message: client sends `{"type": "generate"}` after posting a user message; server starts streaming `{"type": "chunk", "content": "..."}` frames; on completion, server persists the AI message and sends `{"type": "end"}`; on failure, `{"type": "error", "message": "..."}` then close.
 - [ ] **5.3** Add `conversation_service.persist_ai_message(conversation_id, full_content)` and call it at the end of the stream.
 - [ ] **5.4** Register the WS router in `main.py`.

@@ -17,6 +17,14 @@ async def create_or_get_conversation(body: ConversationCreate) -> ConversationOu
     return await conversation_service.get_or_create(body.name, body.email)
 
 
+@router.get("/lookup", response_model=ConversationOut)
+async def lookup_conversation(email: str) -> ConversationOut:
+    conversation = await conversation_service.lookup_by_email(email)
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    return conversation
+
+
 @router.get("/{conversation_id}", response_model=ConversationOut)
 async def get_conversation(conversation_id: str) -> ConversationOut:
     conversation = await conversation_service.get_conversation(conversation_id)

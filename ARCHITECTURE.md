@@ -149,6 +149,7 @@ No formal ports/adapters, no dependency injection container, no use cases as cla
 |--------|------|---------|
 | `POST` | `/conversations` | Create or retrieve conversation by `{name, email}` |
 | `GET` | `/conversations/{id}` | Fetch full conversation with message history |
+| `GET` | `/conversations/lookup` | Check if a conversation exists by `?email=...`; returns it or 404 |
 | `POST` | `/conversations/{id}/messages` | Send a user message; returns the saved user message |
 | `DELETE` | `/conversations/{id}/messages` | Clear all messages; user record (name, email) is preserved |
 | `WS` | `/ws/conversations/{id}` | Stream AI response tokens after a user message is sent |

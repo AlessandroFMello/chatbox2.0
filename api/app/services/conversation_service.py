@@ -10,6 +10,10 @@ async def get_or_create(name: str, email: str) -> ConversationOut:
     return await conversation_repository.create(name, email)
 
 
+async def lookup_by_email(email: str) -> ConversationOut | None:
+    return await conversation_repository.get_by_email(email)
+
+
 async def add_user_message(conversation_id: str, content: str) -> Message:
     message = Message(role=Role.user, content=content)
     await conversation_repository.append_message(conversation_id, message)

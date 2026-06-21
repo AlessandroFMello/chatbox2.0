@@ -51,7 +51,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
   - `GET /conversations/{id}` → returns the full conversation.
   - `POST /conversations/{id}/messages` → calls `add_user_message`, returns the saved message.
 - [x] **3.3** Register the router in `main.py`.
-- [ ] **3.4** Manually verify via Swagger: create a conversation, fetch it, post a user message, fetch again to see the message persisted.
+- [x] **3.4** Manually verify via Swagger: create a conversation, fetch it, post a user message, fetch again to see the message persisted.
 
 **Exit criteria:** Full REST flow works end-to-end (still no AI). Data persists across container restarts (Mongo volume).
 
@@ -59,7 +59,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 4 — AI integration
 
-- [ ] **4.1** Create `api/app/services/ai_service.py` with:
+- [x] **4.1** Create `api/app/services/ai_service.py` with:
   - The fixed system prompt (flat-Earth advocate, addresses user by name, stays in character).
   - A method `build_prompt(user_name, messages)` that assembles the request payload (system instruction + history).
   - A method `stream_response(user_name, messages) -> AsyncIterator[str]` that calls Gemini in streaming mode and yields text chunks.

@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import _client, get_conversations_collection
+from app.routers import conversations
 
 
 @asynccontextmanager
@@ -23,6 +24,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+app.include_router(conversations.router)
 
 
 @app.get("/health")

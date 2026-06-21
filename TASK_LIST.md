@@ -50,7 +50,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
   - `POST /conversations` → calls `get_or_create`, returns `ConversationOut`.
   - `GET /conversations/{id}` → returns the full conversation.
   - `POST /conversations/{id}/messages` → calls `add_user_message`, returns the saved message.
-- [ ] **3.3** Register the router in `main.py`.
+- [x] **3.3** Register the router in `main.py`.
 - [ ] **3.4** Manually verify via Swagger: create a conversation, fetch it, post a user message, fetch again to see the message persisted.
 
 **Exit criteria:** Full REST flow works end-to-end (still no AI). Data persists across container restarts (Mongo volume).

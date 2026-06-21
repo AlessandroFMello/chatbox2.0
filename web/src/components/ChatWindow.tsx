@@ -11,7 +11,8 @@ interface Props {
 
 export default function ChatWindow({ conversation, onSwitchUser }: Props) {
   const [messages, setMessages] = useState<Message[]>(conversation.messages)
-  const [isStreaming, setIsStreaming] = useState(false) // wired in Phase 10
+  const [isStreaming, setIsStreaming] = useState(false)
+  void setIsStreaming // wired by useChatSocket in Phase 10
   const [error, setError] = useState<string | null>(null)
 
   async function handleSend(content: string) {

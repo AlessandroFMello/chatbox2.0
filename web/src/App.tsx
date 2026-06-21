@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import UserIdentityForm from './components/UserIdentityForm'
+import ChatWindow from './components/ChatWindow'
 import { lookupConversation, createConversation, getConversation, type Conversation } from './services/api'
 
 type IdentityStep = 'email' | 'name'
@@ -93,18 +94,5 @@ export default function App() {
     )
   }
 
-  // Placeholder — replaced by <ChatWindow> in Phase 9
-  return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center gap-4">
-      <p className="text-gray-600 text-sm">
-        Olá, {conversation.user_name}! Chat em breve…
-      </p>
-      <button
-        onClick={handleSwitchUser}
-        className="text-xs text-indigo-600 hover:underline"
-      >
-        Trocar usuário
-      </button>
-    </div>
-  )
+  return <ChatWindow conversation={conversation} onSwitchUser={handleSwitchUser} />
 }

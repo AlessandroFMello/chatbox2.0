@@ -75,7 +75,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **5.1** Create `api/app/routers/ws.py` with a `WebSocket /ws/conversations/{id}` endpoint.
 - [x] **5.2** Protocol per client message: client sends `{"type": "generate"}` after posting a user message; server starts streaming `{"type": "chunk", "content": "..."}` frames; on completion, server persists the AI message and sends `{"type": "end"}`; on failure, `{"type": "error", "message": "..."}` then close.
 - [x] **5.3** Add `conversation_service.persist_ai_message(conversation_id, full_content)` and call it at the end of the stream.
-- [ ] **5.4** Register the WS router in `main.py`.
+- [x] **5.4** Register the WS router in `main.py`.
 - [ ] **5.5** Manually verify with a WebSocket client (e.g. `websocat`, browser DevTools, or a temp HTML page) that streaming works.
 
 **Exit criteria:** A user message followed by a WS `generate` event produces a streamed reply that ends with the full message persisted in Mongo.

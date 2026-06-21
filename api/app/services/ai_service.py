@@ -2,9 +2,14 @@ from typing import AsyncIterator
 
 from google import genai
 from google.genai import types
+from google.genai.errors import APIError
 
 from app.config import settings
 from app.models.message import Message, Role
+
+
+class AIServiceError(Exception):
+    pass
 
 _client = genai.Client(api_key=settings.AI_API_KEY)
 
@@ -65,10 +70,13 @@ async def stream_response(user_name: str, messages: list[Message]) -> AsyncItera
     config = types.GenerateContentConfig(
         system_instruction=_system_prompt(user_name),
     )
-    async for chunk in _client.aio.models.generate_content_stream(
-        model=settings.AI_MODEL,
-        contents=contents,
-        config=config,
-    ):
-        if chunk.text:
-            yield chunk.text
+    try:
+        async for chunk in _client.aio.models.generate_content_stream(
+            model=settings.AI_MODEL,
+            contents=contents,
+            config=config,
+        ):
+            if chunk.text:
+                yield chunk.text
+    except APIError as e:
+        raise AIServiceError(str(e)) from e

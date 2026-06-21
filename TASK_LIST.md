@@ -63,7 +63,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
   - The fixed system prompt (flat-Earth advocate, addresses user by name, stays in character).
   - A method `build_prompt(user_name, messages)` that assembles the request payload (system instruction + history).
   - A method `stream_response(user_name, messages) -> AsyncIterator[str]` that calls Gemini in streaming mode and yields text chunks.
-- [ ] **4.2** Add error handling: if the SDK raises, the iterator raises a typed `AIServiceError` the WebSocket layer can catch.
+- [x] **4.2** Add error handling: if the SDK raises, the iterator raises a typed `AIServiceError` the WebSocket layer can catch.
 - [ ] **4.3** Smoke-test `ai_service` by writing a small script that prints chunks for a hard-coded message (do not commit the script).
 
 **Exit criteria:** Calling `ai_service.stream_response(...)` from a Python REPL yields tokens from Gemini.

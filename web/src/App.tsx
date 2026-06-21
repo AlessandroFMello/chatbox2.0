@@ -1,14 +1,41 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import UserIdentityForm from './components/UserIdentityForm'
-import { lookupConversation, createConversation, type Conversation } from './services/api'
+import { lookupConversation, createConversation, getConversation, type Conversation } from './services/api'
 
 type IdentityStep = 'email' | 'name'
+
+const SESSION_KEY = 'chatterbox_session'
 
 export default function App() {
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [step, setStep] = useState<IdentityStep>('email')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Restore session from localStorage on mount
+  useEffect(() => {
+    const raw = localStorage.getItem(SESSION_KEY)
+    if (!raw) return
+    const { conversationId } = JSON.parse(raw) as { conversationId: string }
+    setIsLoading(true)
+    getConversation(conversationId)
+      .then(setConversation)
+      .catch(() => localStorage.removeItem(SESSION_KEY))
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  // Persist session whenever conversation is set
+  useEffect(() => {
+    if (!conversation) return
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ conversationId: conversation.id }))
+  }, [conversation])
+
+  function handleSwitchUser() {
+    localStorage.removeItem(SESSION_KEY)
+    setConversation(null)
+    setStep('email')
+    setError(null)
+  }
 
   async function handleLookup(email: string) {
     setIsLoading(true)
@@ -40,6 +67,14 @@ export default function App() {
     }
   }
 
+  if (isLoading && !conversation) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-400 text-sm">Carregando…</p>
+      </div>
+    )
+  }
+
   if (!conversation) {
     return (
       <>
@@ -60,10 +95,16 @@ export default function App() {
 
   // Placeholder — replaced by <ChatWindow> in Phase 9
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center gap-4">
       <p className="text-gray-600 text-sm">
         Olá, {conversation.user_name}! Chat em breve…
       </p>
+      <button
+        onClick={handleSwitchUser}
+        className="text-xs text-indigo-600 hover:underline"
+      >
+        Trocar usuário
+      </button>
     </div>
   )
 }

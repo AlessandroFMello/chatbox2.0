@@ -19,6 +19,7 @@ services:
       - mongo
     volumes:
       - ./api/app:/app/app
+      - ./api/tests:/app/tests
     restart: unless-stopped
 
   web:

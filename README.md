@@ -162,6 +162,13 @@ O método de streaming do SDK do Google Gemini retorna uma corrotina (não um it
 ### Frames vazios do WebSocket causavam `JSONDecodeError`
 Clientes como Insomnia (e alguns browsers) enviam um frame de texto vazio ao estabelecer a conexão WebSocket. `receive_json()` tentava fazer `json.loads("")` e levantava `JSONDecodeError`, encerrando a conexão antes da primeira mensagem real. A solução foi trocar para `receive_text()` com uma verificação `if not text.strip(): continue` para ignorar frames vazios silenciosamente.
 
+### Cota gratuita do Gemini esgotou durante os testes — suporte a múltiplos provedores de IA
+Ninguém pediu isso. Não estava no escopo. Mas no meio dos testes manuais o Gemini educadamente informou que meu tier gratuito havia acabado, e eu tenho créditos pagos na OpenAI. Podia simplesmente ter trocado o SDK e seguido em frente, mas aproveitar a situação para suportar múltiplos provedores via variável de ambiente pareceu mais honesto do que enterrar uma troca silenciosa no código.
+
+**Solução:** `AI_PROVIDER=gemini|openai` em `.env` seleciona o provedor. `AI_API_KEY` e `AI_MODEL` são reutilizados — só o valor muda conforme o provedor. A troca é feita no único lugar correto: `ai_service.py`. O router WebSocket, o `conversation_service` e o frontend não sabem que isso existe.
+
+**Trade-off documentado:** suporte a múltiplos provedores foi implementado *depois* da API estar completa e testada, motivado por uma limitação operacional real, não por um requisito do sistema. Em produção, a abstração seria feita desde o início, com testes para ambos os caminhos.
+
 ### Gemini respondendo perguntas fora do personagem
 O modelo respondia a perguntas completamente fora do escopo (ex: receitas de comida) em vez de redirecionar para o tema da Terra plana, apesar do system prompt. O prompt foi ajustado com uma seção explícita de "Off-topic requests" instruindo o modelo a não atender requisições não relacionadas e redirecionar a conversa de volta ao tema central.
 

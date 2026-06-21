@@ -76,7 +76,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **5.2** Protocol per client message: client sends `{"type": "generate"}` after posting a user message; server starts streaming `{"type": "chunk", "content": "..."}` frames; on completion, server persists the AI message and sends `{"type": "end"}`; on failure, `{"type": "error", "message": "..."}` then close.
 - [x] **5.3** Add `conversation_service.persist_ai_message(conversation_id, full_content)` and call it at the end of the stream.
 - [x] **5.4** Register the WS router in `main.py`.
-- [ ] **5.5** Manually verify with a WebSocket client (e.g. `websocat`, browser DevTools, or a temp HTML page) that streaming works.
+- [x] **5.5** Manually verify with a WebSocket client (e.g. `websocat`, browser DevTools, or a temp HTML page) that streaming works.
 
 **Exit criteria:** A user message followed by a WS `generate` event produces a streamed reply that ends with the full message persisted in Mongo.
 
@@ -84,7 +84,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 6 — Backend tests
 
-- [ ] **6.1** Create `api/tests/conftest.py` with fixtures:
+- [x] **6.1** Create `api/tests/conftest.py` with fixtures:
   - `in_memory_repository` — a fake repository implementing the same interface.
   - `fake_ai_service` — yields a fixed sequence of chunks.
 - [ ] **6.2** Write `tests/test_conversation_service.py` covering: get_or_create returns existing on duplicate email; new email creates a conversation; add_user_message appends correctly; persist_ai_message appends with role=assistant.

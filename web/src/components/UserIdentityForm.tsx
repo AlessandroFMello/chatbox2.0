@@ -1,17 +1,24 @@
 import { useState } from 'react'
 
 interface Props {
-  /** Controlled by App: 'email' = first step, 'name' = second step (new user only) */
   step: 'email' | 'name'
+  email: string
   isLoading: boolean
-  onLookup: (email: string) => void
-  onCreate: (name: string, email: string) => void
+  onEmailChange: (email: string) => void
+  onLookup: () => void
+  onCreate: (name: string) => void
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export default function UserIdentityForm({ step, isLoading, onLookup, onCreate }: Props) {
-  const [email, setEmail] = useState('')
+export default function UserIdentityForm({
+  step,
+  email,
+  isLoading,
+  onEmailChange,
+  onLookup,
+  onCreate,
+}: Props) {
   const [name, setName] = useState('')
   const [emailError, setEmailError] = useState('')
 
@@ -22,13 +29,13 @@ export default function UserIdentityForm({ step, isLoading, onLookup, onCreate }
       return
     }
     setEmailError('')
-    onLookup(email)
+    onLookup()
   }
 
   function handleNameSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!name.trim()) return
-    onCreate(name.trim(), email)
+    onCreate(name.trim())
   }
 
   return (
@@ -50,7 +57,7 @@ export default function UserIdentityForm({ step, isLoading, onLookup, onCreate }
               <input
                 type="email"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={e => onEmailChange(e.target.value)}
                 placeholder="voce@exemplo.com"
                 autoFocus
                 required

@@ -10,6 +10,7 @@ const SESSION_KEY = 'chatterbox_session'
 export default function App() {
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [step, setStep] = useState<IdentityStep>('email')
+  const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -35,10 +36,11 @@ export default function App() {
     localStorage.removeItem(SESSION_KEY)
     setConversation(null)
     setStep('email')
+    setEmail('')
     setError(null)
   }
 
-  async function handleLookup(email: string) {
+  async function handleLookup() {
     setIsLoading(true)
     setError(null)
     try {
@@ -55,7 +57,7 @@ export default function App() {
     }
   }
 
-  async function handleCreate(name: string, email: string) {
+  async function handleCreate(name: string) {
     setIsLoading(true)
     setError(null)
     try {
@@ -81,7 +83,9 @@ export default function App() {
       <>
         <UserIdentityForm
           step={step}
+          email={email}
           isLoading={isLoading}
+          onEmailChange={setEmail}
           onLookup={handleLookup}
           onCreate={handleCreate}
         />

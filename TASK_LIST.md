@@ -45,7 +45,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 3 — Conversation endpoints
 
-- [ ] **3.1** Create `api/app/services/conversation_service.py` with `get_or_create(name, email)` and `add_user_message(conversation_id, content)` methods.
+- [x] **3.1** Create `api/app/services/conversation_service.py` with `get_or_create(name, email)` and `add_user_message(conversation_id, content)` methods.
 - [ ] **3.2** Create `api/app/routers/conversations.py` with:
   - `POST /conversations` → calls `get_or_create`, returns `ConversationOut`.
   - `GET /conversations/{id}` → returns the full conversation.

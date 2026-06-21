@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Conversation, Message } from '../services/api'
 import { sendUserMessage, clearMessages } from '../services/api'
+import { useChatSocket } from '../hooks/useChatSocket'
 import MessageList from './MessageList'
 import MessageInput from './MessageInput'
 
@@ -11,28 +12,40 @@ interface Props {
 
 export default function ChatWindow({ conversation, onSwitchUser }: Props) {
   const [messages, setMessages] = useState<Message[]>(conversation.messages)
-  const [isStreaming, setIsStreaming] = useState(false)
-  void setIsStreaming // wired by useChatSocket in Phase 10
-  const [error, setError] = useState<string | null>(null)
+  const [wsError, setWsError] = useState<string | null>(null)
+
+  function handleComplete(fullContent: string) {
+    setMessages(prev => [...prev, {
+      role: 'assistant',
+      content: fullContent,
+      timestamp: new Date().toISOString(),
+    }])
+  }
+
+  const { isStreaming, streamingContent, start } = useChatSocket({
+    conversationId: conversation.id,
+    onComplete: handleComplete,
+    onError: setWsError,
+  })
 
   async function handleSend(content: string) {
-    setError(null)
+    setWsError(null)
     try {
       const saved = await sendUserMessage(conversation.id, content)
       setMessages(prev => [...prev, saved])
-      // Phase 10: trigger WebSocket stream here
+      start()
     } catch {
-      setError('Falha ao enviar mensagem. Tente novamente.')
+      setWsError('Falha ao enviar mensagem. Tente novamente.')
     }
   }
 
   async function handleClear() {
-    setError(null)
+    setWsError(null)
     try {
       await clearMessages(conversation.id)
       setMessages([])
     } catch {
-      setError('Falha ao limpar a conversa.')
+      setWsError('Falha ao limpar a conversa.')
     }
   }
 
@@ -62,10 +75,13 @@ export default function ChatWindow({ conversation, onSwitchUser }: Props) {
         </div>
       </header>
 
-      <MessageList messages={messages} />
+      <MessageList
+        messages={messages}
+        streamingContent={isStreaming ? streamingContent : undefined}
+      />
 
-      {error && (
-        <p className="text-center text-red-500 text-xs py-1 bg-red-50">{error}</p>
+      {wsError && (
+        <p className="text-center text-red-500 text-xs py-1 bg-red-50 shrink-0">{wsError}</p>
       )}
 
       <MessageInput isStreaming={isStreaming} onSend={handleSend} />

@@ -131,9 +131,9 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 ## Phase 10 — WebSocket streaming on the client
 
 - [x] **10.1** Create `src/hooks/useChatSocket.ts`: opens a WS to `/ws/conversations/{id}`; exposes `isStreaming`, `streamingContent`, `start()`, and an `onComplete(fullContent)` callback.
-- [ ] **10.2** In `ChatWindow.tsx`: after `sendUserMessage` resolves, call `start()` to begin streaming. Show a placeholder AI bubble whose content is `streamingContent` while streaming.
-- [ ] **10.3** On `onComplete`, replace the placeholder with a real message in the list.
-- [ ] **10.4** Handle WS errors visibly (small red banner; don't crash the app).
+- [x] **10.2** In `ChatWindow.tsx`: after `sendUserMessage` resolves, call `start()` to begin streaming. Show a placeholder AI bubble whose content is `streamingContent` while streaming.
+- [x] **10.3** On `onComplete`, replace the placeholder with a real message in the list.
+- [x] **10.4** Handle WS errors visibly (small red banner; don't crash the app).
 
 **Exit criteria:** Sending a user message triggers a streamed AI reply visible token by token. Refreshing the page shows the full reply persisted in Mongo.
 

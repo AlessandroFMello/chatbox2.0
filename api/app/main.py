@@ -1,9 +1,20 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.database import _client
 
-app = FastAPI(title="ChatterBox API")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await _client.admin.command("ping")
+    yield
+    _client.close()
+
+
+app = FastAPI(title="ChatterBox API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,

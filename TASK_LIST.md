@@ -24,7 +24,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **1.3** Create `api/app/config.py` with a `Settings` class (Pydantic `BaseSettings`) reading `MONGO_URI`, `MONGO_DB`, `AI_API_KEY`, `AI_MODEL`, `CORS_ORIGINS`.
 - [x] **1.4** Create `api/.env.example` with placeholders for every variable in `Settings`.
 - [x] **1.5** Add CORS middleware to `main.py` using `Settings.CORS_ORIGINS`.
-- [ ] **1.6** Run `docker compose up api mongo --build`; verify `GET http://localhost:8000/health` returns 200 and `http://localhost:8000/docs` loads.
+- [x] **1.6** Run `docker compose up api mongo --build`; verify `GET http://localhost:8000/health` returns 200 and `http://localhost:8000/docs` loads.
 
 **Exit criteria:** API container starts cleanly, health endpoint responds, Swagger renders.
 
@@ -32,8 +32,8 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 2 — Database layer
 
-- [ ] **2.1** Create `api/app/database.py` with a Motor client initialized at module load using `Settings.MONGO_URI`; expose a `get_conversations_collection()` helper.
-- [ ] **2.2** Hook up `startup` and `shutdown` events in `main.py` to connect / disconnect the Motor client.
+- [x] **2.1** Create `api/app/database.py` with a Motor client initialized at module load using `Settings.MONGO_URI`; expose a `get_conversations_collection()` helper.
+- [x] **2.2** Hook up `startup` and `shutdown` events in `main.py` to connect / disconnect the Motor client.
 - [ ] **2.3** On startup, create the unique index on `user_email` in the `conversations` collection.
 - [ ] **2.4** Create `api/app/models/message.py` with a `Message` Pydantic model (`role`, `content`, `timestamp`) and a `Role` enum (`user`, `assistant`).
 - [ ] **2.5** Create `api/app/models/conversation.py` with `Conversation` (document shape) and request/response schemas: `ConversationCreate` (name, email), `ConversationOut` (id, name, email, messages, timestamps).

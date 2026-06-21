@@ -37,6 +37,7 @@ export function useChatSocket({ conversationId, onComplete, onError }: Options):
     wsRef.current = ws
 
     ws.onmessage = (event: MessageEvent) => {
+      if (ws !== wsRef.current) return
       const data = JSON.parse(event.data as string) as { type: string; content?: string; message?: string }
 
       if (data.type === 'chunk' && data.content) {
@@ -52,6 +53,7 @@ export function useChatSocket({ conversationId, onComplete, onError }: Options):
     }
 
     ws.onerror = () => {
+      if (ws !== wsRef.current) return
       onErrorRef.current('Erro de conexão WebSocket.')
       resetStream(false)
     }

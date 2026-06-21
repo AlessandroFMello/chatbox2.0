@@ -165,6 +165,24 @@ Clientes como Insomnia (e alguns browsers) enviam um frame de texto vazio ao est
 ### Gemini respondendo perguntas fora do personagem
 O modelo respondia a perguntas completamente fora do escopo (ex: receitas de comida) em vez de redirecionar para o tema da Terra plana, apesar do system prompt. O prompt foi ajustado com uma seção explícita de "Off-topic requests" instruindo o modelo a não atender requisições não relacionadas e redirecionar a conversa de volta ao tema central.
 
+### Conversa única por e-mail impedia recomeçar do zero
+Percebido após a API estar finalizada: como cada e-mail tem exatamente uma conversa, o usuário que quisesse testar um chat limpo ou simplesmente começar uma nova conversa ficava preso no histórico acumulado. Não havia como limpar sem acessar o banco diretamente.
+
+**Solução:** botão "Nova conversa" na interface do chat. Ao clicar, o frontend chama um novo endpoint (`DELETE /conversations/{id}/messages`) que apaga apenas o array de mensagens do documento no MongoDB, preservando o registro do usuário (nome, e-mail, `_id`). Nenhuma regra de negócio é alterada; a conversa simplesmente recomeça vazia.
+
+Cogitei um comando de texto (`/clear`) digitado no próprio chat, mas descartei: intuitivo apenas para desenvolvedores. Um botão visível é a escolha certa para qualquer perfil de usuário.
+
+### Formulário de entrada pedia nome e e-mail juntos, mas nome era ignorado no retorno
+Percebido após a API estar finalizada: o formulário inicial solicitava **nome + e-mail** de uma vez. Para usuários novos, funciona; para usuários que retornam, o campo de nome era inútil — o `conversation_service` ignora o nome se o e-mail já existe. Pior: se o usuário digitasse um nome diferente do que usou na primeira vez, o dado seria silenciosamente descartado.
+
+**Solução:** fluxo em duas etapas no frontend + novo endpoint `GET /conversations/lookup?email=...` na API:
+1. Frontend pede apenas o e-mail.
+2. Chama o endpoint de lookup.
+3. Se a conversa existe (`200`) → carrega o histórico e abre o chat diretamente, sem pedir nome.
+4. Se não existe (`404`) → exibe o campo de nome → cria a conversa via `POST /conversations`.
+
+O endpoint de lookup é somente leitura e não altera nenhuma lógica existente.
+
 </details>
 
 ---

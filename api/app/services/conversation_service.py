@@ -23,3 +23,7 @@ async def get_conversation(conversation_id: str) -> ConversationOut | None:
 async def persist_ai_message(conversation_id: str, content: str) -> None:
     message = Message(role=Role.assistant, content=content)
     await conversation_repository.append_message(conversation_id, message)
+
+
+async def clear_messages(conversation_id: str) -> None:
+    await conversation_repository.clear_messages(conversation_id)

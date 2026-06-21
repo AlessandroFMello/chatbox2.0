@@ -28,3 +28,11 @@ async def get_conversation(conversation_id: str) -> ConversationOut:
 @router.post("/{conversation_id}/messages", response_model=Message, status_code=201)
 async def add_message(conversation_id: str, body: MessageCreate) -> Message:
     return await conversation_service.add_user_message(conversation_id, body.content)
+
+
+@router.delete("/{conversation_id}/messages", status_code=204)
+async def clear_messages(conversation_id: str) -> None:
+    conversation = await conversation_service.get_conversation(conversation_id)
+    if not conversation:
+        raise HTTPException(status_code=404, detail="Conversation not found")
+    await conversation_service.clear_messages(conversation_id)

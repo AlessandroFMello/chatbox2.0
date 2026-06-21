@@ -48,3 +48,12 @@ async def append_message(conversation_id: str, message: Message) -> None:
             "$set": {"updated_at": now},
         },
     )
+
+
+async def clear_messages(conversation_id: str) -> None:
+    col = get_conversations_collection()
+    now = datetime.now(timezone.utc)
+    await col.update_one(
+        {"_id": ObjectId(conversation_id)},
+        {"$set": {"messages": [], "updated_at": now}},
+    )

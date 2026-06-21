@@ -121,7 +121,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **9.1** Create `src/components/MessageBubble.tsx`: takes `{role, content}`; user messages right-aligned with one color, AI left-aligned with another, Tailwind classes only.
 - [x] **9.2** Create `src/components/MessageList.tsx`: takes `messages`, renders bubbles, auto-scrolls to bottom when the list grows.
 - [x] **9.3** Create `src/components/MessageInput.tsx`: textarea + send button; `Enter` sends, `Shift+Enter` newline; disables while a stream is in progress.
-- [ ] **9.4** Create `src/components/ChatWindow.tsx` composing the three above plus a header showing the user's name.
+- [x] **9.4** Create `src/components/ChatWindow.tsx` composing the three above plus a header showing the user's name.
 - [ ] **9.5** Render `ChatWindow` from `App.tsx` once a conversation exists.
 
 **Exit criteria:** Existing messages from a conversation are visible. Typing and pressing send adds a user message via REST (no streaming yet).

@@ -44,7 +44,7 @@ async def test_stream_response_yields_chunks_in_order():
                 yield SimpleNamespace(text=text)
         return _gen()
 
-    with patch("app.services.ai_service._client") as mock_client:
+    with patch("app.services.ai_service._gemini_client") as mock_client:
         mock_client.aio.models.generate_content_stream = mock_generate
         chunks = []
         async for chunk in stream_response("Alessandro", messages):
@@ -63,8 +63,8 @@ async def test_stream_response_wraps_sdk_error_in_ai_service_error():
     async def mock_failing(*args, **kwargs):
         raise FakeAPIError("quota exceeded")
 
-    with patch("app.services.ai_service._client") as mock_client, \
-         patch("app.services.ai_service.APIError", FakeAPIError):
+    with patch("app.services.ai_service._gemini_client") as mock_client, \
+         patch("app.services.ai_service.GeminiAPIError", FakeAPIError):
         mock_client.aio.models.generate_content_stream = mock_failing
         with pytest.raises(AIServiceError):
             async for _ in stream_response("Alessandro", messages):

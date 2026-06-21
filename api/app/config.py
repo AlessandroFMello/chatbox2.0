@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     MONGO_URI: str
     MONGO_DB: str
+    AI_PROVIDER: str  # "gemini" or "openai"
     AI_API_KEY: str
     AI_MODEL: str
     CORS_ORIGINS: str

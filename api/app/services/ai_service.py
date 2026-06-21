@@ -2,7 +2,9 @@ from typing import AsyncIterator
 
 from google import genai
 from google.genai import types
-from google.genai.errors import APIError
+from google.genai.errors import APIError as GeminiAPIError
+from openai import AsyncOpenAI
+from openai import APIError as OpenAIAPIError
 
 from app.config import settings
 from app.models.message import Message, Role
@@ -11,12 +13,12 @@ from app.models.message import Message, Role
 class AIServiceError(Exception):
     pass
 
-_client = genai.Client(api_key=settings.AI_API_KEY)
 
-_ROLE_MAP = {
-    Role.user: "user",
-    Role.assistant: "model",
-}
+_gemini_client = genai.Client(api_key=settings.AI_API_KEY) if settings.AI_PROVIDER == "gemini" else None
+_openai_client = AsyncOpenAI(api_key=settings.AI_API_KEY) if settings.AI_PROVIDER == "openai" else None
+
+_GEMINI_ROLE_MAP = {Role.user: "user", Role.assistant: "model"}
+_OPENAI_ROLE_MAP = {Role.user: "user", Role.assistant: "assistant"}
 
 
 def _system_prompt(user_name: str) -> str:
@@ -61,27 +63,58 @@ def _system_prompt(user_name: str) -> str:
 
 
 def build_prompt(user_name: str, messages: list[Message]) -> list[types.Content]:
+    """Builds Gemini-format content list. Used by the Gemini streaming path."""
     return [
         types.Content(
-            role=_ROLE_MAP[message.role],
+            role=_GEMINI_ROLE_MAP[message.role],
             parts=[types.Part(text=message.content)],
         )
         for message in messages
     ]
 
 
-async def stream_response(user_name: str, messages: list[Message]) -> AsyncIterator[str]:
-    contents = build_prompt(user_name, messages)
-    config = types.GenerateContentConfig(
-        system_instruction=_system_prompt(user_name),
+def _build_openai_messages(user_name: str, messages: list[Message]) -> list[dict]:
+    result: list[dict] = [{"role": "system", "content": _system_prompt(user_name)}]
+    result.extend(
+        {"role": _OPENAI_ROLE_MAP[m.role], "content": m.content}
+        for m in messages
     )
+    return result
+
+
+async def stream_response(user_name: str, messages: list[Message]) -> AsyncIterator[str]:
+    provider = _stream_openai if settings.AI_PROVIDER == "openai" else _stream_gemini
+    async for chunk in provider(user_name, messages):
+        yield chunk
+
+
+async def _stream_gemini(user_name: str, messages: list[Message]) -> AsyncIterator[str]:
+    assert _gemini_client is not None
+    contents = build_prompt(user_name, messages)
+    config = types.GenerateContentConfig(system_instruction=_system_prompt(user_name))
     try:
-        async for chunk in await _client.aio.models.generate_content_stream(
+        async for chunk in await _gemini_client.aio.models.generate_content_stream(
             model=settings.AI_MODEL,
             contents=contents,
             config=config,
         ):
             if chunk.text:
                 yield chunk.text
-    except APIError as e:
+    except GeminiAPIError as e:
+        raise AIServiceError(str(e)) from e
+
+
+async def _stream_openai(user_name: str, messages: list[Message]) -> AsyncIterator[str]:
+    assert _openai_client is not None
+    try:
+        stream = await _openai_client.chat.completions.create(
+            model=settings.AI_MODEL,
+            messages=_build_openai_messages(user_name, messages),  # type: ignore[arg-type]
+            stream=True,
+        )
+        async for chunk in stream:
+            content = chunk.choices[0].delta.content
+            if content:
+                yield content
+    except OpenAIAPIError as e:
         raise AIServiceError(str(e)) from e

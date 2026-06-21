@@ -195,6 +195,7 @@ O endpoint de lookup é somente leitura e não altera nenhuma lógica existente.
 - **RAG**: faria sentido se a IA precisasse responder com base em uma base de conhecimento específica (produtos, políticas, etc). Como o objetivo aqui é um papel de persuasão fixo via system prompt, RAG não agrega valor — mas seria a escolha natural no ChatterBox 2.0 real, quando a IA precisar de conhecimento específico de cada cliente.
 - **Next.js no lugar de React puro**: o principal ganho de Next.js seria uma camada de BFF para esconder chaves de API do client. Como a API Python já cumpre esse papel (a chave de IA nunca chega ao frontend), esse benefício não se aplica aqui, então mantive React puro (Vite).
 - **TanStack Query / Zustand**: o fluxo de dados é simples o bastante (uma leitura de histórico, um envio de mensagem, um stream) para `useState` e `fetch` nativo, sem necessidade de cache ou estado global.
+- **React 19**: disponível e estável, mas o `@vitejs/plugin-react@4.x` declara suporte apenas até o React 18. Usar React 19 exigiria `--legacy-peer-deps` na instalação, o que introduz risco em um projeto auditado. Como nenhuma feature exclusiva do React 19 (`useOptimistic`, `use()`, `ref` como prop) era necessária, mantive o React 18 para garantir um `npm install` limpo e sem avisos.
 
 </details>
 

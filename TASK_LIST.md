@@ -100,7 +100,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **7.1** Inside `web/`, scaffold a Vite + React project (`npm create vite@latest . -- --template react`).
 - [x] **7.2** Install Tailwind and configure `tailwind.config.js`, `postcss.config.js`, and `src/index.css` with the three Tailwind directives.
 - [x] **7.3** Create `src/services/api.js` with `createOrGetConversation({name, email})`, `getConversation(id)`, `sendUserMessage(id, content)`. Single `apiFetch` helper using native `fetch`.
-- [ ] **7.4** Wire the `web` service in Docker Compose; confirm `http://localhost:5173` shows the default Vite page.
+- [x] **7.4** Wire the `web` service in Docker Compose; confirm `http://localhost:5173` shows the default Vite page.
 
 **Exit criteria:** Frontend container builds and serves a page. Tailwind classes work in a smoke test (e.g. `bg-red-500` on the root div).
 
@@ -108,8 +108,8 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 8 — Identity flow
 
-- [ ] **8.1** Create `src/components/UserIdentityForm.jsx` with two fields (name, email), basic email format validation, a submit button.
-- [ ] **8.2** In `App.jsx`, manage `currentConversation` state: if absent, render the identity form; on submit, call `createOrGetConversation`, store the returned conversation, then render the chat shell.
+- [x] **8.1** Create `src/components/UserIdentityForm.tsx` with two fields (name, email), basic email format validation, a submit button.
+- [ ] **8.2** In `App.tsx`, manage `currentConversation` state: if absent, render the identity form; on submit, call `createOrGetConversation`, store the returned conversation, then render the chat shell.
 - [ ] **8.3** Persist `{conversationId, name, email}` in `localStorage` so a page reload skips the form. Add a "Trocar usuário" link to clear it.
 
 **Exit criteria:** Form submission creates/retrieves a conversation. Reloading the page keeps the user in their chat.
@@ -118,11 +118,11 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 9 — Chat UI
 
-- [ ] **9.1** Create `src/components/MessageBubble.jsx`: takes `{role, content}`; user messages right-aligned with one color, AI left-aligned with another, Tailwind classes only.
-- [ ] **9.2** Create `src/components/MessageList.jsx`: takes `messages`, renders bubbles, auto-scrolls to bottom when the list grows.
-- [ ] **9.3** Create `src/components/MessageInput.jsx`: textarea + send button; `Enter` sends, `Shift+Enter` newline; disables while a stream is in progress.
-- [ ] **9.4** Create `src/components/ChatWindow.jsx` composing the three above plus a header showing the user's name.
-- [ ] **9.5** Render `ChatWindow` from `App.jsx` once a conversation exists.
+- [ ] **9.1** Create `src/components/MessageBubble.tsx`: takes `{role, content}`; user messages right-aligned with one color, AI left-aligned with another, Tailwind classes only.
+- [ ] **9.2** Create `src/components/MessageList.tsx`: takes `messages`, renders bubbles, auto-scrolls to bottom when the list grows.
+- [ ] **9.3** Create `src/components/MessageInput.tsx`: textarea + send button; `Enter` sends, `Shift+Enter` newline; disables while a stream is in progress.
+- [ ] **9.4** Create `src/components/ChatWindow.tsx` composing the three above plus a header showing the user's name.
+- [ ] **9.5** Render `ChatWindow` from `App.tsx` once a conversation exists.
 
 **Exit criteria:** Existing messages from a conversation are visible. Typing and pressing send adds a user message via REST (no streaming yet).
 
@@ -131,7 +131,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 ## Phase 10 — WebSocket streaming on the client
 
 - [ ] **10.1** Create `src/hooks/useChatSocket.js`: opens a WS to `/ws/conversations/{id}`; exposes `isStreaming`, `streamingContent`, `start()`, and an `onComplete(fullContent)` callback.
-- [ ] **10.2** In `ChatWindow.jsx`: after `sendUserMessage` resolves, call `start()` to begin streaming. Show a placeholder AI bubble whose content is `streamingContent` while streaming.
+- [ ] **10.2** In `ChatWindow.tsx`: after `sendUserMessage` resolves, call `start()` to begin streaming. Show a placeholder AI bubble whose content is `streamingContent` while streaming.
 - [ ] **10.3** On `onComplete`, replace the placeholder with a real message in the list.
 - [ ] **10.4** Handle WS errors visibly (small red banner; don't crash the app).
 

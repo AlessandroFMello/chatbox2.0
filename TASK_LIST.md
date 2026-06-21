@@ -141,11 +141,11 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 11 — Polish and trade-offs documentation
 
-- [ ] **11.1** Add a loading state on initial conversation fetch.
-- [ ] **11.2** Add a basic empty state ("Diga oi para começar a conversa") when the conversation has zero messages.
-- [ ] **11.3** Ensure error messages from the API are surfaced (not silently swallowed).
-- [ ] **11.4** Take screenshots / record a short GIF of the streaming in action; place in `docs/`.
-- [ ] **11.5** Update `README.md` "Demonstração" section with the GIF/screenshots.
+- [x] **11.1** Add a loading state on initial conversation fetch.
+- [x] **11.2** Add a basic empty state ("Diga oi para começar a conversa") when the conversation has zero messages.
+- [x] **11.3** Ensure error messages from the API are surfaced (not silently swallowed).
+- [x] **11.4** Take screenshots / record a short GIF of the streaming in action; place in `docs/`.
+- [x] **11.5** Update `README.md` "Demonstração" section with the GIF/screenshots.
 - [ ] **11.6** Final pass on `README.md` — make sure every trade-off mentioned in earlier conversations is documented.
 - [ ] **11.7** Run `docker compose down -v && docker compose up --build` from a clean state; ensure everything still works.
 - [ ] **11.8** Review the definition of done and check off every box.

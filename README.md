@@ -105,7 +105,24 @@ docker compose up --build
 <details>
 <summary><strong>Demonstração</strong></summary>
 
-> *A ser adicionado após implementação: GIF curto mostrando o streaming ao vivo e uma troca de mensagens em que a IA defende a tese da Terra plana.*
+**Streaming ao vivo**
+
+<img src="docs/Peek 21-06-2026 12-06.gif" alt="Streaming da IA ao vivo" width="800" />
+
+**Capturas de tela**
+
+<table>
+<tr>
+  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-43-50.png" width="260" /><br/><sub>1. Tela inicial</sub></td>
+  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-44-16.png" width="260" /><br/><sub>2. Identificação</sub></td>
+  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-44-26.png" width="260" /><br/><sub>3. Chat com histórico</sub></td>
+</tr>
+<tr>
+  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-44-35.png" width="260" /><br/><sub>4. Resposta em streaming</sub></td>
+  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-50-34.png" width="260" /><br/><sub>5. Nova conversa</sub></td>
+  <td></td>
+</tr>
+</table>
 
 </details>
 

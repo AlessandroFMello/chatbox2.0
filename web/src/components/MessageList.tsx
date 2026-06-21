@@ -16,6 +16,9 @@ export default function MessageList({ messages, streamingContent }: Props) {
 
   return (
     <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
+      {messages.length === 0 && !streamingContent && (
+        <p className="m-auto text-gray-400 text-sm select-none">Diga algo para começar a conversa</p>
+      )}
       {messages.map((msg, i) => (
         <MessageBubble key={i} role={msg.role} content={msg.content} />
       ))}

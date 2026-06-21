@@ -88,7 +88,6 @@ chatterbox-poc/
 ├── .gitignore
 ├── README.md
 ├── ARCHITECTURE.md
-├── CLAUDE.md
 ├── TASK_LIST.md
 └── LICENSE
 ```
@@ -162,7 +161,7 @@ No formal ports/adapters, no dependency injection container, no use cases as cla
 3. Server reads the conversation history, builds the prompt, calls Gemini in streaming mode.
 4. Server forwards each token chunk to the client as JSON frames: `{"type": "chunk", "content": "..."}`.
 5. When the stream ends, the server persists the full AI message and sends `{"type": "end"}`.
-6. Client closes the socket (or keeps it for the next message — see CLAUDE.md for the chosen approach).
+6. Client keeps the socket open for subsequent messages in the same session (one connection per chat session).
 
 ## 5. AI integration
 

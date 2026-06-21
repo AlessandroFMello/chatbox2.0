@@ -72,8 +72,34 @@ A resposta da IA é transmitida token a token via WebSocket, dando a sensação 
 ### Identificação sem autenticação
 Como autenticação não é requisito, optei por uma tela inicial pedindo apenas **nome** e **e-mail**. O e-mail permite retomar conversas anteriores; o nome é usado pela IA para personalizar a conversa. Não há senha, sessão ou validação real — é identificação leve para fins de UX, não controle de acesso. Decisão alinhada com o arquiteto por e-mail.
 
+### Motor: cliente singleton no nível de módulo
+O cliente Motor (driver async do MongoDB) é instanciado uma única vez na inicialização da aplicação, não por requisição. Isso garante reutilização do pool de conexões interno do Motor. Criar um cliente por requisição resultaria em overhead desnecessário e potencial esgotamento de conexões.
+
+### Persistência da mensagem da IA após o stream
+A mensagem gerada pela IA é persistida no MongoDB apenas após o término completo do stream, com o conteúdo concatenado. Persistir token a token seria mais complexo, mais custoso em operações de escrita e deixaria documentos em estado parcial em caso de falha a meio do stream.
+
+### REST para escrita + WebSocket apenas para streaming
+Mensagens do usuário são enviadas via REST (`POST /conversations/{id}/messages`) antes de acionar o WebSocket. O WebSocket recebe apenas o sinal de geração (`{"type": "generate"}`) e transmite os chunks da IA. Essa separação mantém cada protocolo na função em que é mais adequado: REST para operações com garantias claras de status HTTP, WebSocket para transmissão contínua.
+
+### Conversa única por e-mail
+O e-mail é a chave única da conversa, garantido por índice único no MongoDB. Se o usuário retornar com o mesmo e-mail, a conversa existente é retomada. Isso simplifica o modelo de dados para o escopo da PoC; em produção, múltiplas conversas por usuário seriam o caminho natural.
+
+### System prompt estruturado e testável
+O system prompt da IA foi dividido em seções explícitas (persona, objetivo, regras de comportamento, estilo de resposta, tratamento de desafios, desvios de assunto e idioma) em vez de um parágrafo genérico. Isso torna cada comportamento esperado verificável individualmente e facilita ajustes sem quebrar outras partes da instrução.
+
 ### Organização do código (API)
 Separação em camadas simples (`routers` → `services` → `repositories`), sem abstrações formais de interface/injeção de dependência. Suficiente para isolar responsabilidades sem o peso de Clean Architecture completa.
+
+## Problemas encontrados e como foram resolvidos
+
+### `generate_content_stream` exige `await` antes da iteração
+O método de streaming do SDK do Google Gemini retorna uma corrotina (não um iterador assíncrono diretamente). Tentar iterar com `async for chunk in client.aio.models.generate_content_stream(...)` sem o `await` resulta em `TypeError: 'async for' requires an object with __aiter__ method, got coroutine`. A correção é `async for chunk in await client.aio.models.generate_content_stream(...)`.
+
+### Frames vazios do WebSocket causavam `JSONDecodeError`
+Clientes como Insomnia (e alguns browsers) enviam um frame de texto vazio ao estabelecer a conexão WebSocket. `receive_json()` tentava fazer `json.loads("")` e levantava `JSONDecodeError`, encerrando a conexão antes da primeira mensagem real. A solução foi trocar para `receive_text()` com uma verificação `if not text.strip(): continue` para ignorar frames vazios silenciosamente.
+
+### Gemini respondendo perguntas fora do personagem
+O modelo respondia a perguntas completamente fora do escopo (ex: receitas de comida) em vez de redirecionar para o tema da Terra plana, apesar do system prompt. O prompt foi ajustado com uma seção explícita de "Off-topic requests" instruindo o modelo a não atender requisições não relacionadas e redirecionar a conversa de volta ao tema central.
 
 ## O que considerei e decidi não aplicar
 
@@ -110,7 +136,6 @@ chatterbox-poc/
 ├── docker-compose.yml
 ├── README.md        # (este arquivo)
 ├── ARCHITECTURE.md  # Detalhamento da arquitetura
-├── CLAUDE.md        # Guia para desenvolvimento assistido por Claude Code
 ├── TASK_LIST.md     # Lista sequencial de tarefas de implementação
 └── LICENSE
 ```

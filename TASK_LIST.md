@@ -148,7 +148,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [ ] **11.5** Update `README.md` "Demonstração" section with the GIF/screenshots.
 - [ ] **11.6** Final pass on `README.md` — make sure every trade-off mentioned in earlier conversations is documented.
 - [ ] **11.7** Run `docker compose down -v && docker compose up --build` from a clean state; ensure everything still works.
-- [ ] **11.8** Read `CLAUDE.md` Section 9 ("Definition of done") and check off every box.
+- [ ] **11.8** Review the definition of done and check off every box.
 
 **Exit criteria:** Project meets the definition of done. README is presentation-ready.
 

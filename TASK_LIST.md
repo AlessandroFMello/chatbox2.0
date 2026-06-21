@@ -36,7 +36,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 - [x] **2.2** Hook up `startup` and `shutdown` events in `main.py` to connect / disconnect the Motor client.
 - [x] **2.3** On startup, create the unique index on `user_email` in the `conversations` collection.
 - [x] **2.4** Create `api/app/models/message.py` with a `Message` Pydantic model (`role`, `content`, `timestamp`) and a `Role` enum (`user`, `assistant`).
-- [ ] **2.5** Create `api/app/models/conversation.py` with `Conversation` (document shape) and request/response schemas: `ConversationCreate` (name, email), `ConversationOut` (id, name, email, messages, timestamps).
+- [x] **2.5** Create `api/app/models/conversation.py` with `Conversation` (document shape) and request/response schemas: `ConversationCreate` (name, email), `ConversationOut` (id, name, email, messages, timestamps).
 - [ ] **2.6** Create `api/app/repositories/conversation_repository.py` with methods: `get_by_email`, `create`, `get_by_id`, `append_message`. All async; all input/output as Pydantic models or primitives, never raw Mongo dicts at the boundary.
 
 **Exit criteria:** Database connects on startup. Index is created. Models compile. Repository methods exist (not yet exercised end-to-end).

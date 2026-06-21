@@ -11,7 +11,9 @@ async def ws_chat(websocket: WebSocket, conversation_id: str) -> None:
     await websocket.accept()
     try:
         while True:
-            await websocket.receive_json()
+            text = await websocket.receive_text()
+            if not text.strip():
+                continue
 
             conversation = await conversation_service.get_conversation(conversation_id)
             if not conversation:

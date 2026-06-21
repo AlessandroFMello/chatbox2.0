@@ -23,16 +23,18 @@ PoC para validar uma reescrita do ChatterBox como sistema desacoplado (API + Web
 ---
 
 <a name="contexto"></a>
+
 <details>
 <summary><strong>Contexto</strong></summary>
 
-Esta PoC valida o fluxo essencial: usuário inicia uma conversa, troca mensagens com uma IA que tem um objetivo fixo de persuasão (*"convencer o usuário que a Terra é plana"*), e as mensagens são exibidas em tempo real via streaming.
+Esta PoC valida o fluxo essencial: usuário inicia uma conversa, troca mensagens com uma IA que tem um objetivo fixo de persuasão (_"convencer o usuário que a Terra é plana"_), e as mensagens são exibidas em tempo real via streaming.
 
 </details>
 
 ---
 
 <a name="arquitetura"></a>
+
 <details>
 <summary><strong>Arquitetura</strong></summary>
 
@@ -49,32 +51,37 @@ Tudo sobe via Docker Compose como três serviços isolados, simulando a separaç
 ---
 
 <a name="stack"></a>
+
 <details>
 <summary><strong>Stack</strong></summary>
 
-| Camada | Tecnologia |
-|--------|-----------|
-| Backend | Python 3.12 + FastAPI + Motor (Mongo async) |
-| Banco | MongoDB 7 |
-| Frontend | React 18 + Vite + Tailwind CSS |
-| IA | Google Gemini 2.5 Flash (tier gratuito do AI Studio) |
-| Testes | pytest + pytest-asyncio |
-| Infra local | Docker Compose |
+| Camada      | Tecnologia                                           |
+| ----------- | ---------------------------------------------------- |
+| Backend     | Python 3.12 + FastAPI + Motor (Mongo async)          |
+| Banco       | MongoDB 7                                            |
+| Frontend    | React 18 + Vite + Tailwind CSS                       |
+| IA          | Google Gemini 2.5 Flash (tier gratuito do AI Studio) |
+| Testes      | pytest + pytest-asyncio                              |
+| Infra local | Docker Compose                                       |
 
 </details>
 
 ---
 
 <a name="como-rodar"></a>
+
 <details>
 <summary><strong>Como rodar</strong></summary>
 
-**Pré-requisitos:** Docker e Docker Compose instalados; chave de API do Google AI Studio (gratuita em <https://aistudio.google.com/apikey>).
+**Pré-requisitos:** Docker e Docker Compose instalados; chave de API de um provedor de IA (Gemini ou OpenAI).
 
 ```bash
 # 1. Configurar variáveis de ambiente
 cp api/.env.example api/.env
-# Edite api/.env e preencha AI_API_KEY com sua chave do Google AI Studio
+# Edite api/.env:
+#   AI_PROVIDER=gemini   (ou openai)
+#   AI_API_KEY=sua_chave
+#   AI_MODEL=gemini-2.5-flash   (ou gpt-4o-mini, etc.)
 
 # 2. Subir tudo
 docker compose up --build
@@ -89,6 +96,7 @@ docker compose up --build
 ---
 
 <a name="fluxo-da-aplicação"></a>
+
 <details>
 <summary><strong>Fluxo da aplicação</strong></summary>
 
@@ -102,6 +110,7 @@ docker compose up --build
 ---
 
 <a name="demonstração"></a>
+
 <details>
 <summary><strong>Demonstração</strong></summary>
 
@@ -129,77 +138,115 @@ docker compose up --build
 ---
 
 <a name="decisões-técnicas-e-trade-offs"></a>
+
 <details>
 <summary><strong>Decisões técnicas e trade-offs</strong></summary>
 
 ### Provedor de IA: Google Gemini 2.5 Flash
+
 Gratuito no tier do AI Studio, suporta streaming nativo via SDK Python. A chave fica isolada na API (variável de ambiente), nunca exposta ao frontend.
 
 ### Modelagem no Mongo
+
 Mensagens embutidas como array dentro do documento de conversa, em vez de collection separada. Para o volume esperado de uma conversa de demonstração, isso é mais simples e mais alinhado ao modelo de documentos do Mongo. Em um cenário de conversas muito longas, separar em collection própria com paginação seria mais adequado.
 
 ### Contexto enviado à IA
+
 O histórico completo da conversa é enviado a cada chamada ao modelo. Funciona bem no escopo desta PoC; em produção, precisaria de truncamento ou sumarização para conversas longas, por custo e limite de contexto.
 
 ### Streaming via WebSocket
-A resposta da IA é transmitida token a token via WebSocket, dando a sensação de *"digitação ao vivo"*. A persistência no Mongo ocorre após o término do streaming, com a mensagem completa.
+
+A resposta da IA é transmitida token a token via WebSocket, dando a sensação de _"digitação ao vivo"_. A persistência no Mongo ocorre após o término do streaming, com a mensagem completa.
 
 ### Identificação sem autenticação
+
 Como autenticação não é requisito, optei por uma tela inicial pedindo apenas **nome** e **e-mail**. O e-mail permite retomar conversas anteriores; o nome é usado pela IA para personalizar a conversa. Não há senha, sessão ou validação real — é identificação leve para fins de UX, não controle de acesso. Decisão alinhada com o arquiteto por e-mail.
 
 ### Motor: cliente singleton no nível de módulo
+
 O cliente Motor (driver async do MongoDB) é instanciado uma única vez na inicialização da aplicação, não por requisição. Isso garante reutilização do pool de conexões interno do Motor. Criar um cliente por requisição resultaria em overhead desnecessário e potencial esgotamento de conexões.
 
 ### Persistência da mensagem da IA após o stream
+
 A mensagem gerada pela IA é persistida no MongoDB apenas após o término completo do stream, com o conteúdo concatenado. Persistir token a token seria mais complexo, mais custoso em operações de escrita e deixaria documentos em estado parcial em caso de falha a meio do stream.
 
 ### REST para escrita + WebSocket apenas para streaming
+
 Mensagens do usuário são enviadas via REST (`POST /conversations/{id}/messages`) antes de acionar o WebSocket. O WebSocket recebe apenas o sinal de geração (`{"type": "generate"}`) e transmite os chunks da IA. Essa separação mantém cada protocolo na função em que é mais adequado: REST para operações com garantias claras de status HTTP, WebSocket para transmissão contínua.
 
 ### Conversa única por e-mail
+
 O e-mail é a chave única da conversa, garantido por índice único no MongoDB. Se o usuário retornar com o mesmo e-mail, a conversa existente é retomada. Isso simplifica o modelo de dados para o escopo da PoC; em produção, múltiplas conversas por usuário seriam o caminho natural.
 
 ### System prompt estruturado e testável
+
 O system prompt da IA foi dividido em seções explícitas (persona, objetivo, regras de comportamento, estilo de resposta, tratamento de desafios, desvios de assunto e idioma) em vez de um parágrafo genérico. Isso torna cada comportamento esperado verificável individualmente e facilita ajustes sem quebrar outras partes da instrução.
 
 ### Organização do código (API)
+
 Separação em camadas simples (`routers` → `services` → `repositories`), sem abstrações formais de interface/injeção de dependência. Suficiente para isolar responsabilidades sem o peso de Clean Architecture completa.
+
+### TypeScript no frontend
+
+O frontend foi escrito inteiramente em TypeScript (`.tsx`/`.ts`), com `strict: true`. A escolha é direta: tipagem estática captura erros em tempo de compilação, especialmente nas interfaces de API (`Message`, `Conversation`) e nos contratos de props entre componentes. O custo é mínimo — Vite transpila TS nativamente, sem configuração adicional além do `tsconfig.json`.
+
+### Estratégia de testes
+
+Testes automatizados cobrem `conversation_service` (orquestração) e `ai_service` (construção do prompt, chunking, tratamento de erro do SDK) — os dois pontos de maior risco e lógica de negócio. Routers e repositórios não têm testes unitários: routers são plumbing FastAPI testável mais eficientemente via integração, e repositórios exigiriam um Mongo real ou um mock frágil. O frontend não tem testes automatizados — para o escopo de uma PoC, teste manual no app rodando é suficiente. E2E seria o próximo passo natural.
+
+### Dockerfiles orientados a desenvolvimento
+
+Os Dockerfiles são intencionalmente simples: build single-stage, usuário root, sem hardening de produção. O objetivo é reduzir atrito no `docker compose up --build` durante a avaliação, não simular um ambiente de produção. Um Dockerfile de produção usaria multi-stage build, usuário não-root e imagem base menor (`python:3.12-slim`).
 
 </details>
 
 ---
 
 <a name="problemas-encontrados-e-como-foram-resolvidos"></a>
+
 <details>
 <summary><strong>Problemas encontrados e como foram resolvidos</strong></summary>
 
 ### `generate_content_stream` exige `await` antes da iteração
+
 O método de streaming do SDK do Google Gemini retorna uma corrotina (não um iterador assíncrono diretamente). Tentar iterar com `async for chunk in client.aio.models.generate_content_stream(...)` sem o `await` resulta em `TypeError: 'async for' requires an object with __aiter__ method, got coroutine`. A correção é `async for chunk in await client.aio.models.generate_content_stream(...)`.
 
 ### Frames vazios do WebSocket causavam `JSONDecodeError`
+
 Clientes como Insomnia (e alguns browsers) enviam um frame de texto vazio ao estabelecer a conexão WebSocket. `receive_json()` tentava fazer `json.loads("")` e levantava `JSONDecodeError`, encerrando a conexão antes da primeira mensagem real. A solução foi trocar para `receive_text()` com uma verificação `if not text.strip(): continue` para ignorar frames vazios silenciosamente.
 
 ### Cota gratuita do Gemini esgotou durante os testes — suporte a múltiplos provedores de IA
+
 Ninguém pediu isso. Não estava no escopo. Mas no meio dos testes manuais o Gemini educadamente informou que meu tier gratuito havia acabado, e eu tenho créditos pagos na OpenAI. Podia simplesmente ter trocado o SDK e seguido em frente, mas aproveitar a situação para suportar múltiplos provedores via variável de ambiente pareceu mais honesto do que enterrar uma troca silenciosa no código.
 
 **Solução:** `AI_PROVIDER=gemini|openai` em `.env` seleciona o provedor. `AI_API_KEY` e `AI_MODEL` são reutilizados — só o valor muda conforme o provedor. A troca é feita no único lugar correto: `ai_service.py`. O router WebSocket, o `conversation_service` e o frontend não sabem que isso existe.
 
-**Trade-off documentado:** suporte a múltiplos provedores foi implementado *depois* da API estar completa e testada, motivado por uma limitação operacional real, não por um requisito do sistema. Em produção, a abstração seria feita desde o início, com testes para ambos os caminhos.
+**Trade-off documentado:** suporte a múltiplos provedores foi implementado _depois_ da API estar completa e testada, motivado por uma limitação operacional real, não por um requisito do sistema. Em produção, a abstração seria feita desde o início, com testes para ambos os caminhos.
 
 ### Gemini respondendo perguntas fora do personagem
+
 O modelo respondia a perguntas completamente fora do escopo (ex: receitas de comida) em vez de redirecionar para o tema da Terra plana, apesar do system prompt. O prompt foi ajustado com uma seção explícita de "Off-topic requests" instruindo o modelo a não atender requisições não relacionadas e redirecionar a conversa de volta ao tema central.
 
 ### Conversa única por e-mail impedia recomeçar do zero
+
 Percebido após a API estar finalizada: como cada e-mail tem exatamente uma conversa, o usuário que quisesse testar um chat limpo ou simplesmente começar uma nova conversa ficava preso no histórico acumulado. Não havia como limpar sem acessar o banco diretamente.
 
 **Solução:** botão "Nova conversa" na interface do chat. Ao clicar, o frontend chama um novo endpoint (`DELETE /conversations/{id}/messages`) que apaga apenas o array de mensagens do documento no MongoDB, preservando o registro do usuário (nome, e-mail, `_id`). Nenhuma regra de negócio é alterada; a conversa simplesmente recomeça vazia.
 
 Cogitei um comando de texto (`/clear`) digitado no próprio chat, mas descartei: intuitivo apenas para desenvolvedores. Um botão visível é a escolha certa para qualquer perfil de usuário.
 
+### React StrictMode causava erro de WebSocket na inicialização
+
+Em desenvolvimento, o React StrictMode executa os efeitos duas vezes (mount → cleanup → mount) para detectar efeitos com limpeza incompleta. O hook `useChatSocket` abre um WebSocket no `useEffect`. O StrictMode fechava a primeira conexão ainda em estado `CONNECTING`, o que disparava `onerror` antes da segunda conexão (a real) sequer abrir. Resultado: a mensagem de erro aparecia na tela ao carregar o chat, antes de qualquer interação.
+
+**Solução:** cada handler de evento (`onmessage`, `onerror`) verifica se a instância que disparou o evento ainda é a conexão ativa (`ws === wsRef.current`). Instâncias descartadas pelo cleanup são ignoradas silenciosamente.
+
 ### Formulário de entrada pedia nome e e-mail juntos, mas nome era ignorado no retorno
+
 Percebido após a API estar finalizada: o formulário inicial solicitava **nome + e-mail** de uma vez. Para usuários novos, funciona; para usuários que retornam, o campo de nome era inútil — o `conversation_service` ignora o nome se o e-mail já existe. Pior: se o usuário digitasse um nome diferente do que usou na primeira vez, o dado seria silenciosamente descartado.
 
 **Solução:** fluxo em duas etapas no frontend + novo endpoint `GET /conversations/lookup?email=...` na API:
+
 1. Frontend pede apenas o e-mail.
 2. Chama o endpoint de lookup.
 3. Se a conversa existe (`200`) → carrega o histórico e abre o chat diretamente, sem pedir nome.
@@ -212,6 +259,7 @@ O endpoint de lookup é somente leitura e não altera nenhuma lógica existente.
 ---
 
 <a name="o-que-considerei-e-decidi-não-aplicar"></a>
+
 <details>
 <summary><strong>O que considerei e decidi não aplicar</strong></summary>
 
@@ -226,6 +274,7 @@ O endpoint de lookup é somente leitura e não altera nenhuma lógica existente.
 ---
 
 <a name="o-que-foi-deixado-de-fora-intencionalmente"></a>
+
 <details>
 <summary><strong>O que foi deixado de fora intencionalmente</strong></summary>
 
@@ -240,6 +289,7 @@ O endpoint de lookup é somente leitura e não altera nenhuma lógica existente.
 ---
 
 <a name="próximos-passos-fora-do-escopo-da-poc"></a>
+
 <details>
 <summary><strong>Próximos passos (fora do escopo da PoC)</strong></summary>
 
@@ -254,6 +304,7 @@ O endpoint de lookup é somente leitura e não altera nenhuma lógica existente.
 ---
 
 <a name="estrutura-do-repositório"></a>
+
 <details>
 <summary><strong>Estrutura do repositório</strong></summary>
 
@@ -276,6 +327,7 @@ chatterbox-poc/
 ---
 
 <a name="licença"></a>
+
 <details>
 <summary><strong>Licença</strong></summary>
 

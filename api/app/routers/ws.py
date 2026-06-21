@@ -26,7 +26,8 @@ async def ws_chat(websocket: WebSocket, conversation_id: str) -> None:
                 full_content += chunk
                 await websocket.send_json({"type": "chunk", "content": chunk})
 
-            await conversation_service.persist_ai_message(conversation_id, full_content)
+            if full_content:
+                await conversation_service.persist_ai_message(conversation_id, full_content)
             await websocket.send_json({"type": "end"})
 
     except AIServiceError as e:

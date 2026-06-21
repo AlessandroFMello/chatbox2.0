@@ -98,8 +98,8 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 ## Phase 7 — Frontend scaffolding
 
 - [x] **7.1** Inside `web/`, scaffold a Vite + React project (`npm create vite@latest . -- --template react`).
-- [x] **7.2** Install Tailwind and configure `tailwind.config.js`, `postcss.config.js`, and `src/index.css` with the three Tailwind directives.
-- [x] **7.3** Create `src/services/api.js` with `createOrGetConversation({name, email})`, `getConversation(id)`, `sendUserMessage(id, content)`. Single `apiFetch` helper using native `fetch`.
+- [x] **7.2** Install Tailwind and configure `tailwind.config.ts`, `postcss.config.ts`, and `src/index.css` with the three Tailwind directives.
+- [x] **7.3** Create `src/services/api.ts` with `createOrGetConversation({name, email})`, `getConversation(id)`, `sendUserMessage(id, content)`. Single `apiFetch` helper using native `fetch`.
 - [x] **7.4** Wire the `web` service in Docker Compose; confirm `http://localhost:5173` shows the default Vite page.
 
 **Exit criteria:** Frontend container builds and serves a page. Tailwind classes work in a smoke test (e.g. `bg-red-500` on the root div).
@@ -130,7 +130,7 @@ Sequential implementation plan. Tasks are designed to be completed in order; eac
 
 ## Phase 10 — WebSocket streaming on the client
 
-- [ ] **10.1** Create `src/hooks/useChatSocket.js`: opens a WS to `/ws/conversations/{id}`; exposes `isStreaming`, `streamingContent`, `start()`, and an `onComplete(fullContent)` callback.
+- [x] **10.1** Create `src/hooks/useChatSocket.ts`: opens a WS to `/ws/conversations/{id}`; exposes `isStreaming`, `streamingContent`, `start()`, and an `onComplete(fullContent)` callback.
 - [ ] **10.2** In `ChatWindow.tsx`: after `sendUserMessage` resolves, call `start()` to begin streaming. Show a placeholder AI bubble whose content is `streamingContent` while streaming.
 - [ ] **10.3** On `onComplete`, replace the placeholder with a real message in the list.
 - [ ] **10.4** Handle WS errors visibly (small red banner; don't crash the app).

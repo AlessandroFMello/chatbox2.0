@@ -71,7 +71,7 @@ async def stream_response(user_name: str, messages: list[Message]) -> AsyncItera
         system_instruction=_system_prompt(user_name),
     )
     try:
-        async for chunk in _client.aio.models.generate_content_stream(
+        async for chunk in await _client.aio.models.generate_content_stream(
             model=settings.AI_MODEL,
             contents=contents,
             config=config,

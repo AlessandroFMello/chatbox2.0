@@ -113,13 +113,13 @@ docker compose up --build
 
 <table>
 <tr>
-  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-43-50.png" width="260" /><br/><sub>1. Tela inicial</sub></td>
-  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-44-16.png" width="260" /><br/><sub>2. Identificação</sub></td>
-  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-44-26.png" width="260" /><br/><sub>3. Chat com histórico</sub></td>
+  <td align="center"><img src="docs/01-tela-de-email.png" width="260" /><br/><sub>1. Tela de e-mail</sub></td>
+  <td align="center"><img src="docs/02-chat-vazio.png" width="260" /><br/><sub>2. Chat vazio</sub></td>
+  <td align="center"><img src="docs/03-streaming-incompleto.png" width="260" /><br/><sub>3. Streaming ao vivo</sub></td>
 </tr>
 <tr>
-  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-44-35.png" width="260" /><br/><sub>4. Resposta em streaming</sub></td>
-  <td align="center"><img src="docs/Captura de tela de 2026-06-21 11-50-34.png" width="260" /><br/><sub>5. Nova conversa</sub></td>
+  <td align="center"><img src="docs/03-streaming-completo.png" width="260" /><br/><sub>4. Streaming completo</sub></td>
+  <td align="center"><img src="docs/04-chat-com-troca.png" width="260" /><br/><sub>5. Chat com histórico</sub></td>
   <td></td>
 </tr>
 </table>
